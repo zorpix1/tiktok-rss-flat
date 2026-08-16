@@ -12,28 +12,24 @@ permissions:
 
 jobs:
   scheduled:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64]
     steps:
       - name: checkout repo content
-        uses: actions/checkout@v3 # checkout the repository content to github runner.
+        uses: actions/checkout@v4
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.12 #install the python needed
+          python-version: '3.12'
       - name: execute py script
         env:
           MS_TOKEN: ${{ secrets.MS_TOKEN }}
         run: |
-          export DISPLAY=:99
-          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
-          python3.12 -m venv venv
-          source venv/bin/activate
-          echo "VIRTUAL ENV:" $VIRTUAL_ENV
-          pip install playwright==1.40.0
-          pip install -r requirements.txt
-          python -m playwright install
-          # playwright install-deps
-          python postprocessing.py
+          python -m venv venv
+          .\venv\Scripts\python.exe -m pip install --upgrade pip
+          .\venv\Scripts\python.exe -m pip install playwright==1.40.0
+          .\venv\Scripts\python.exe -m pip install -r requirements.txt
+          .\venv\Scripts\python.exe -m playwright install chromium
+          .\venv\Scripts\python.exe postprocessing.py
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
